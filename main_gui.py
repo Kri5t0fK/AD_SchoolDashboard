@@ -11,10 +11,13 @@ Main class GUI_MainWindow implements:
 
 # Other Libs
 from PyQt5 import QtWidgets as qtw  # GUI
+import numpy as np                  # Input data manipulation
 import matplotlib.pyplot as plt     # Plot drawing
 
 # Owned modules
 from src.gui_main_window import Ui_MainWindow   # Auto-generated file - GUI definition
+import src.database_functions as db_func
+
 
 
 class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
@@ -25,6 +28,13 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         # Setup the UI
         self.setupUi(self)
 
+        
+        # Connect database
+        self.DATABASE_PATH = r'./data/AD_Project_School.db'
+
+        # Create a database connection
+        self.db_connection = db_func.create_connection(self.DATABASE_PATH)
+        self.cursor = self.db_connection.cursor()
         # Connect buttons
         self.button_general_refresh.clicked.connect(self._refresh_general_plots)
 
