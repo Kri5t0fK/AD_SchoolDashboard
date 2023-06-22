@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>933</width>
-    <height>667</height>
+    <width>1580</width>
+    <height>1112</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>School Dashboard</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -176,7 +176,7 @@
        <attribute name="title">
         <string>Widok Nauczyciela</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,3,0" columnstretch="1,1">
+       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,3" columnstretch="1,1">
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_teacher_plots">
           <property name="title">
@@ -265,7 +265,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>933</width>
+     <width>1580</width>
      <height>21</height>
     </rect>
    </property>
