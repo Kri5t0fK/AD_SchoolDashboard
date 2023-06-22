@@ -40,15 +40,53 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
 
 
         # Plot and Refresh plots on start
-        # self._refresh_general_plots()
+        self._refresh_general_plots()
 
     
     def _refresh_general_plots(self):
-        # Reset the canvas
-        self.mpl_widget_general_1.axis.clear()
-        self.mpl_widget_general_1.axis.plot([0, 1, 2, 3], [5, 7, 2, 8])
-        # Show (draw) the canvas
-        self.mpl_widget_general_1.canvas.draw()
+        
+        # TABLES: Classes, Subjects, Grades, Teachers, Students
+
+        widget_general_list = [self.mpl_widget_general_1, self.mpl_widget_general_2, self.mpl_widget_general_3]
+        widget_general_names = ['exam_grade_hum', 'exam_grade_mat', 'exam_grade_lang']
+        #TODO: tytuły wykresów
+        
+        
+
+        for widget, column_name in zip(widget_general_list, widget_general_names):
+            # Reset the canvas
+            widget.axis.clear()
+
+            self.cursor.execute(f"SELECT {column_name} FROM Students;")
+            
+            data = np.array(self.cursor.fetchall())
+
+            widget.axis.hist(data, bins='auto', density=True, color='peru', edgecolor='black', zorder=3)
+            widget.axis.set(title=column_name,
+                            xlabel='Wynik [%] z egzaminu',
+                            ylabel='Liczba uczniów')
+            widget.axis.grid(zorder=0)
+            
+            # Show (draw) the canvas
+            widget.canvas.draw()
+        
+
+        def make_autopct(total):
+            def autopct_fun(pct):
+                val = int(round(pct*total/100.0))
+                return f'{val}'
+            return autopct_fun
+
+        str = "SELECT COUNT(ID_Student), Classes.Label FROM Students INNER JOIN Classes ON Students.ID_class=Classes.ID_class GROUP BY Classes.Label"
+        self.cursor.execute(str)
+        data = np.array(self.cursor.fetchall())
+        values = data[:,0].astype('int')
+
+        self.mpl_widget_general_4.axis.pie(values, labels=data[:,1], explode=len(data)*[0.02], autopct=make_autopct(values.sum()),
+                                           labeldistance=1.1, radius=1, textprops={'fontsize': 14})
+        self.mpl_widget_general_4.axis.set(title='Liczba uczniów w poszczgólnych klasach')
+        self.mpl_widget_general_4.canvas.draw()
+    
 
 if __name__ == "__main__":
     import sys
