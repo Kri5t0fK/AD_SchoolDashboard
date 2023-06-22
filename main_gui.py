@@ -38,6 +38,7 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
 
         # Prepare data for comboBoxes
         self._prepare_student_student_comboBox()
+        self._prepare_teacher_comboBox()
 
         # Connect buttons
         self.button_general_refresh.clicked.connect(self._refresh_general_plots)
@@ -52,6 +53,7 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         # Plot and Refresh plots on start
         self._refresh_general_plots()
         self._refresh_student_plots()
+        self._refresh_teacher_plots()
 
     
     def _refresh_general_plots(self):
@@ -132,6 +134,12 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         self.input_comboBox_student_subject.addItems(subject_names_list)
     
     def _refresh_student_plots(self):
+        pass
+
+    def _prepare_teacher_comboBox(self):
+        pass
+
+    def _refresh_teacher_plots(self):
         pass
 
 
