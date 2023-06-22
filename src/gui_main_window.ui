@@ -14,7 +14,251 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout"/>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_general">
+       <attribute name="title">
+        <string>Widok Główny</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="groupBox_school_stats">
+          <property name="title">
+           <string>Statystyki szkoły</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0">
+            <widget class="MplWidget" name="mpl_widget_general_1" native="true"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="MplWidget" name="mpl_widget_general_2" native="true"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="MplWidget" name="mpl_widget_general_3" native="true"/>
+           </item>
+           <item row="2" column="1">
+            <widget class="MplWidget" name="mpl_widget_general_4" native="true"/>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QPushButton" name="button_general_refresh">
+             <property name="text">
+              <string>Odśwież wykresy</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_student_view">
+       <attribute name="title">
+        <string>Widok Ucznia</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,1" columnstretch="1,1">
+        <item row="2" column="0">
+         <widget class="QGroupBox" name="groupBox_student_newest_grades">
+          <property name="title">
+           <string>Ostatnie oceny</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QPlainTextEdit" name="plainTextEdit_student_newest_grades">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="plainText">
+              <string>tu pojawią się oceny
+?
+?
+?
+?</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="3">
+         <widget class="QGroupBox" name="groupBox_student_plots">
+          <property name="title">
+           <string>Wykresy</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="MplWidget" name="mpl_widget_student_1" native="true"/>
+           </item>
+           <item>
+            <widget class="MplWidget" name="mpl_widget_student_2" native="true"/>
+           </item>
+           <item>
+            <widget class="MplWidget" name="mpl_widget_student_3" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_student_data_in">
+          <property name="title">
+           <string>Podaj dane</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_student_student">
+             <property name="text">
+              <string>Imię i nazwisko Ucznia:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="input_comboBox_student_student"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_student_subject">
+             <property name="text">
+              <string>Wybierz Przedmiot:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="input_comboBox_student_subject"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_student_info">
+          <property name="title">
+           <string>Informacje o Uczniu</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_student_class">
+             <property name="text">
+              <string>Klasa</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="lineEdit_student_class">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_student_gender">
+             <property name="text">
+              <string>Płeć</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineEdit_student_gender">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_teacher_view">
+       <attribute name="title">
+        <string>Widok Nauczyciela</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,3,0" columnstretch="1,1">
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_teacher_plots">
+          <property name="title">
+           <string>Wykres</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="MplWidget" name="mpl_widget_teacher_1" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox_teacher_data_in">
+          <property name="title">
+           <string>Podaj dane</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_teacher_teacher">
+             <property name="text">
+              <string>Nauczyciel (imię i nazwisko)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="input_comboBox_teacher_class"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_teacher_class">
+             <property name="text">
+              <string>Klasa</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_teacher_subject">
+             <property name="text">
+              <string>Przedmiot</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="input_comboBox_teacher_teacher"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="input_comboBox_teacher_subject"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="2">
+         <widget class="QGroupBox" name="groupBox_techar_students_list">
+          <property name="title">
+           <string>Lista uczniów w klasie</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QPlainTextEdit" name="plainTextEdit_teacher_students_list">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="plainText">
+              <string>tu pojawi się lista uczniów wybranej klasy
+?
+?
+?
+?</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -28,6 +272,14 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget</class>
+   <extends>QWidget</extends>
+   <header>src.mplwidget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
