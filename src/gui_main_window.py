@@ -56,6 +56,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.plainTextEdit_student_newest_grades = QtWidgets.QPlainTextEdit(self.groupBox_student_newest_grades)
         self.plainTextEdit_student_newest_grades.setEnabled(True)
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(20)
+        self.plainTextEdit_student_newest_grades.setFont(font)
         self.plainTextEdit_student_newest_grades.setReadOnly(True)
         self.plainTextEdit_student_newest_grades.setObjectName("plainTextEdit_student_newest_grades")
         self.verticalLayout_5.addWidget(self.plainTextEdit_student_newest_grades)
@@ -177,7 +181,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -186,7 +190,7 @@ class Ui_MainWindow(object):
         self.groupBox_school_stats.setTitle(_translate("MainWindow", "Statystyki szkoły"))
         self.button_general_refresh.setText(_translate("MainWindow", "Odśwież wykresy"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_general), _translate("MainWindow", "Widok Główny"))
-        self.groupBox_student_newest_grades.setTitle(_translate("MainWindow", "Ostatnie oceny"))
+        self.groupBox_student_newest_grades.setTitle(_translate("MainWindow", "Ostatnie 5 ocen"))
         self.plainTextEdit_student_newest_grades.setPlainText(_translate("MainWindow", "tu pojawią się oceny\n"
 "?\n"
 "?\n"

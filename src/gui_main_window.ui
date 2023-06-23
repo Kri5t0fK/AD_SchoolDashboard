@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -63,13 +63,19 @@
         <item row="2" column="0">
          <widget class="QGroupBox" name="groupBox_student_newest_grades">
           <property name="title">
-           <string>Ostatnie oceny</string>
+           <string>Ostatnie 5 ocen</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit_student_newest_grades">
              <property name="enabled">
               <bool>true</bool>
+             </property>
+             <property name="font">
+              <font>
+               <family>Consolas</family>
+               <pointsize>20</pointsize>
+              </font>
              </property>
              <property name="readOnly">
               <bool>true</bool>
