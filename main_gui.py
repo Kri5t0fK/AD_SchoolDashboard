@@ -39,12 +39,17 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         # Prepare data for comboBoxes
         self._prepare_student_student_comboBox()
         self._prepare_teacher_comboBox()
+        self._prepare_teacher_subject_comboBox()
+        self._prepare_teacher_class_comboBox()
 
         # Connect buttons
         self.button_general_refresh.clicked.connect(self._refresh_general_view)
         # Connect comboBoxes to autorefresh
         self.input_comboBox_student_student.currentIndexChanged.connect(self._refresh_from_student_student)
         self.input_comboBox_student_subject.currentIndexChanged.connect(self._refresh_student_view)
+        self.input_comboBox_teacher_teacher.currentIndexChanged.connect(self._refresh_from_teacher_teacher)
+        self.input_comboBox_teacher_subject.currentIndexChanged.connect(self._refresh_teacher_view)
+        self.input_comboBox_teacher_class.currentIndexChanged.connect(self._refresh_teacher_view)
 
 
 
@@ -69,11 +74,12 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
 
         widget_general_list = [self.mpl_widget_general_1, self.mpl_widget_general_2, self.mpl_widget_general_3]
         widget_general_names = ['exam_grade_hum', 'exam_grade_mat', 'exam_grade_lang']
-        #TODO: tytuły wykresów
+        colors = ['aqua', 'darkorange', 'gold']
+        titles = ['Wyniki Egzaminu Humanistycznego', 'Wyniki Egzaminu Matematycznego', 'Wyniki Egzaminu Językowego']
         
         
 
-        for widget, column_name in zip(widget_general_list, widget_general_names):
+        for widget, column_name, color, title in zip(widget_general_list, widget_general_names, colors, titles):
             # Reset the canvas
             widget.axis.clear()
 
@@ -81,8 +87,8 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
             
             data = np.array(self.cursor.fetchall())
 
-            widget.axis.hist(data, bins='auto', density=True, color='peru', edgecolor='black', zorder=3)
-            widget.axis.set(title=column_name,
+            widget.axis.hist(data, bins='auto', density=True, color=color, edgecolor='black', zorder=3)
+            widget.axis.set(title=title,
                             xlabel='Wynik [%] z egzaminu',
                             ylabel='Liczba uczniów')
             widget.axis.grid(zorder=0)
@@ -236,8 +242,7 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
                             WHERE Students.ID_Student={current_student_ID}""")
         exam_grades_list = np.array(self.cursor.fetchall())[0]
         exam_names = ['Human.', 'Matemat.', 'Językowy']
-        colors = ['green' if val >= 30 else 'red' for val in exam_grades_list]
-        print(exam_grades_list)
+        colors = ['greenyellow' if val >= 30 else 'orangered' for val in exam_grades_list]
         
         self.mpl_widget_student_3.axis.clear()
         bar_cont = self.mpl_widget_student_3.axis.barh(exam_names, exam_grades_list, align='center', height=0.8, color=colors, edgecolor="lightgray", linewidth=0.7, zorder=3)
@@ -246,13 +251,107 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         self.mpl_widget_student_3.axis.set(title="Wyniki egzaminów w [%]",
                                            xlim=(0, 100))
         self.mpl_widget_student_3.canvas.draw()
-        pass
+
+
+    def _refresh_from_teacher_teacher(self):
+        self._prepare_teacher_subject_comboBox()
+        self._prepare_teacher_class_comboBox()
 
     def _prepare_teacher_comboBox(self):
-        pass
+        # Get list of all teachers
+        self.cursor.execute("SELECT ID_teacher, name, surname FROM Teachers ORDER BY name ASC, surname ASC")
+        self.teachers_list = np.array(self.cursor.fetchall())
+
+        # Make list of concatenated [name+surname]
+        full_names_list = [f'{name} {surname}' for name, surname in self.teachers_list[:, 1:3]]
+
+        # Prepare teacher comboBox
+        self.input_comboBox_teacher_teacher.clear()
+        self.input_comboBox_teacher_teacher.addItems(full_names_list)
+
+    def _prepare_teacher_subject_comboBox(self):
+        # Get current selected teacher ID
+        comboBox_index = self.input_comboBox_teacher_teacher.currentIndex()
+        current_teacher_ID = self.teachers_list[comboBox_index, 0]
+
+        # Fetch all subjects for given teacher
+        self.cursor.execute(f"""SELECT Subjects.ID_subject, Subjects.subject_name FROM Subjects
+                            INNER JOIN Teachers ON Subjects.ID_teacher=Teachers.ID_teacher
+                            WHERE Teachers.ID_teacher={current_teacher_ID}
+                            ORDER BY subject_name ASC""")
+        self.teacher_subjects_list = np.array(self.cursor.fetchall())
+        
+        # Make list of subject names
+        subject_names_list = [f'{name}' for name in self.teacher_subjects_list[:, 1]]
+
+        # Prepare subject comboBox
+        self.input_comboBox_teacher_subject.clear()
+        self.input_comboBox_teacher_subject.addItems(subject_names_list)
+
+    def _prepare_teacher_class_comboBox(self):
+        # Get current selected teacher ID
+        comboBox_index = self.input_comboBox_teacher_teacher.currentIndex()
+        current_teacher_ID = self.teachers_list[comboBox_index, 0]
+
+        # Fetch all classes for given teacher
+        self.cursor.execute(f"""SELECT Classes.ID_Class, Classes.Label FROM Classes
+                            INNER JOIN Students ON Classes.ID_Class=Students.ID_Class
+                            INNER JOIN Grades ON Students.ID_Student=Grades.ID_student
+                            INNER JOIN Subjects ON Grades.ID_subject=Subjects.ID_subject
+                            INNER JOIN Teachers ON Subjects.ID_teacher=Teachers.ID_teacher
+                            WHERE Teachers.ID_teacher={current_teacher_ID}
+                            GROUP BY Classes.Label
+                            ORDER BY Classes.Label ASC""")
+        self.teacher_class_list = np.array(self.cursor.fetchall())
+
+        # Make list of class names
+        class_names_list = [f'{name}' for name in self.teacher_class_list[:, 1]]
+
+        # Prepare class comboBox
+        self.input_comboBox_teacher_class.clear()
+        self.input_comboBox_teacher_class.addItems(class_names_list)
 
     def _refresh_teacher_view(self):
-        pass
+        # Get chosen data
+        ## Get current selected teache ID
+        comboBox_index_aux = self.input_comboBox_teacher_teacher.currentIndex()
+        current_teacher_ID = self.teachers_list[comboBox_index_aux, 0]
+        # Get current selected subject ID
+        comboBox_index_aux = self.input_comboBox_teacher_subject.currentIndex()
+        current_subject_ID = self.teacher_subjects_list[comboBox_index_aux, 0]
+        # Get current selected ID
+        comboBox_index_aux = self.input_comboBox_teacher_class.currentIndex()
+        current_class_ID = self.teacher_class_list[comboBox_index_aux, 0] 
+        
+        # Fetch students for given teacher, subject & class
+        self.cursor.execute(f"""SELECT Students.name, Students.surname, AVG(Grades.grade_value), Students.graduated FROM Students
+                            INNER JOIN Classes ON Classes.ID_Class=Students.ID_Class
+                            INNER JOIN Grades ON Students.ID_Student=Grades.ID_student
+                            INNER JOIN Subjects ON Grades.ID_subject=Subjects.ID_subject
+                            INNER JOIN Teachers ON Subjects.ID_teacher=Teachers.ID_teacher
+                            WHERE (Teachers.ID_teacher={current_teacher_ID} AND Subjects.ID_subject={current_subject_ID} AND Classes.ID_Class={current_class_ID})
+                            GROUP BY Students.ID_Student
+                            ORDER BY Students.name ASC, Students.surname ASC""")
+        students_list = np.array(self.cursor.fetchall())
+
+        # Plot 1: Number of graduated students
+        graduated_data = [list(students_list[:,3]).count('tak'), list(students_list[:,3]).count('nie')]
+        self.mpl_widget_teacher_1.axis.clear()
+        self.mpl_widget_teacher_1.axis.pie(graduated_data, labels=['TAK', 'NIE'], explode=2*[0.05], autopct=lambda x: f'{x:.1f}%',
+                                           labeldistance=1.1, radius=1, textprops={'fontsize': 14}, colors=['limegreen', 'chocolate'])
+        self.mpl_widget_teacher_1.axis.set(title="Ukończenie szkoły przez uczniów wybranej klasy")
+        self.mpl_widget_teacher_1.canvas.draw()
+
+        # Text: Prepare text table for output
+        out =  'Śr. ocen | Ukończył | Imię nazwisko\n'
+        out += '---------|----------|---------------'
+        for row in students_list:
+            # date with time cut out
+            name, surname, grades_mean, graduated = row
+            out += f'\n {(grades_mean).astype("float"):^7.2f} | {graduated:^8} | {name} {surname}'
+        ## Print to textBox
+        self.plainTextEdit_teacher_students_list.setPlainText(out)
+
 
 
 if __name__ == "__main__":
