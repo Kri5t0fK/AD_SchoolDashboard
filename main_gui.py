@@ -162,9 +162,10 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
                                INNER JOIN Classes ON Students.ID_Class=Classes.ID_Class
                                WHERE Students.ID_Student={current_student_ID}""")
         student_info = np.array(self.cursor.fetchall())
-        print(student_info)
+        ## Print to textBox
         self.lineEdit_student_gender.setText(student_info[0][0])
         self.lineEdit_student_class.setText(student_info[0][1])
+        
         # Text: Latest 5 grades
         ## get 5 newest grades for current student
         self.cursor.execute(f"""SELECT Grades.date, Grades.grade_value, Subjects.subject_name, Teachers.name, Teachers.surname FROM Grades
@@ -233,16 +234,18 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         ## get exam grades for current student
         self.cursor.execute(f"""SELECT exam_grade_hum, exam_grade_mat, exam_grade_lang FROM Students
                             WHERE Students.ID_Student={current_student_ID}""")
-        exam_grades_list = np.array(self.cursor.fetchall())
-        exam_names = ['Humanistyczny', 'Matematyczny', 'Językowy']
+        exam_grades_list = np.array(self.cursor.fetchall())[0]
+        exam_names = ['Human.', 'Matemat.', 'Językowy']
+        colors = ['green' if val >= 30 else 'red' for val in exam_grades_list]
         print(exam_grades_list)
         
-        # self.mpl_widget_student_3.axis.clear()
-        # self.mpl_widget_student_3.axis.barh(exam_names, exam_grades_list) #, align='center', height=0.8, color="limegreen", edgecolor="lightgray", linewidth=0.7, zorder=3)
-        # self.mpl_widget_student_3.axis.grid(zorder=0)
-        # self.mpl_widget_student_3.axis.set(title="Średnie oceny dla poszczególnych przedmiotów",
-        #                                    ylabel='Średnia ocen')
-        # self.mpl_widget_student_3.canvas.draw()
+        self.mpl_widget_student_3.axis.clear()
+        bar_cont = self.mpl_widget_student_3.axis.barh(exam_names, exam_grades_list, align='center', height=0.8, color=colors, edgecolor="lightgray", linewidth=0.7, zorder=3)
+        self.mpl_widget_student_3.axis.bar_label(bar_cont)
+        self.mpl_widget_student_3.axis.grid(zorder=0)
+        self.mpl_widget_student_3.axis.set(title="Wyniki egzaminów w [%]",
+                                           xlim=(0, 100))
+        self.mpl_widget_student_3.canvas.draw()
         pass
 
     def _prepare_teacher_comboBox(self):
