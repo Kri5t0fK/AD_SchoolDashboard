@@ -41,22 +41,29 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         self._prepare_teacher_comboBox()
 
         # Connect buttons
-        self.button_general_refresh.clicked.connect(self._refresh_general_plots)
+        self.button_general_refresh.clicked.connect(self._refresh_general_view)
         # Connect comboBoxes to autorefresh
         self.input_comboBox_student_student.currentIndexChanged.connect(self._refresh_from_student_student)
-        self.input_comboBox_student_subject.currentIndexChanged.connect(self._refresh_student_plots)
+        self.input_comboBox_student_subject.currentIndexChanged.connect(self._refresh_student_view)
 
 
 
 
+        # print(self.db_connection)
+
+        #TODO: remove (GETTING TABLE NAMES)
+        # self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        # print(self.cursor.fetchall())
 
         # Plot and Refresh plots on start
-        self._refresh_general_plots()
-        self._refresh_student_plots()
-        self._refresh_teacher_plots()
+        self._refresh_general_view()
+        self._prepare_student_subject_comboBox()
+        self._refresh_student_view()
+        self._prepare_teacher_comboBox()
+        self._refresh_teacher_view()
 
     
-    def _refresh_general_plots(self):
+    def _refresh_general_view(self):
         
         # TABLES: Classes, Subjects, Grades, Teachers, Students
 
@@ -94,7 +101,8 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         self.cursor.execute(str)
         data = np.array(self.cursor.fetchall())
         values = data[:,0].astype('int')
-
+        
+        self.mpl_widget_general_4.axis.clear()
         self.mpl_widget_general_4.axis.pie(values, labels=data[:,1], explode=len(data)*[0.02], autopct=make_autopct(values.sum()),
                                            labeldistance=1.1, radius=1, textprops={'fontsize': 14})
         self.mpl_widget_general_4.axis.set(title='Liczba uczniów w poszczgólnych klasach')
@@ -102,7 +110,8 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
     
     def _refresh_from_student_student(self):
         self._prepare_student_subject_comboBox()
-        self._refresh_student_plots()
+        # NOT USED cause it refreshes when subject comboBox gets updated (above)
+        # self._refresh_student_view()
     
     def _prepare_student_student_comboBox(self):
         # Get list of all students
@@ -122,7 +131,12 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         current_student_ID = self.students_list[comboBox_index, 0]
 
         # Fetch all subjects for given student
-        self.cursor.execute(f"SELECT Subjects.ID_subject, Subjects.subject_name FROM Subjects INNER JOIN Grades ON Grades.ID_subject=Subjects.ID_subject INNER JOIN Students ON Students.ID_Student=Grades.ID_student WHERE Students.ID_Student={current_student_ID} GROUP BY Subjects.ID_subject ORDER BY subject_name ASC")
+        self.cursor.execute(f"""SELECT Subjects.ID_subject, Subjects.subject_name FROM Subjects
+                            INNER JOIN Grades ON Grades.ID_subject=Subjects.ID_subject
+                            INNER JOIN Students ON Students.ID_Student=Grades.ID_student
+                            WHERE Students.ID_Student={current_student_ID}
+                            GROUP BY Subjects.subject_name
+                            ORDER BY subject_name ASC""")
         self.student_subjects_list = np.array(self.cursor.fetchall())
 
         # Make list of concatenated [name+surname]
@@ -133,13 +147,108 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         self.input_comboBox_student_subject.clear()
         self.input_comboBox_student_subject.addItems(subject_names_list)
     
-    def _refresh_student_plots(self):
+    def _refresh_student_view(self):
+        # Get chosen data
+        ## Get current selected student ID
+        comboBox_index_aux = self.input_comboBox_student_student.currentIndex()
+        current_student_ID = self.students_list[comboBox_index_aux, 0]
+        ## Get current selected subject ID
+        comboBox_index_aux = self.input_comboBox_student_subject.currentIndex()
+        current_subject_name = self.student_subjects_list[comboBox_index_aux, 1]
+        
+        # Text: Gender and class
+        ## Get gender and class for student
+        self.cursor.execute(f"""SELECT Students.gender, Classes.Label FROM Students
+                               INNER JOIN Classes ON Students.ID_Class=Classes.ID_Class
+                               WHERE Students.ID_Student={current_student_ID}""")
+        student_info = np.array(self.cursor.fetchall())
+        print(student_info)
+        self.lineEdit_student_gender.setText(student_info[0][0])
+        self.lineEdit_student_class.setText(student_info[0][1])
+        # Text: Latest 5 grades
+        ## get 5 newest grades for current student
+        self.cursor.execute(f"""SELECT Grades.date, Grades.grade_value, Subjects.subject_name, Teachers.name, Teachers.surname FROM Grades
+                            INNER JOIN Students ON Students.ID_Student=Grades.ID_student
+                            INNER JOIN Subjects ON Grades.ID_subject=Subjects.ID_subject
+                            INNER JOIN Teachers ON Subjects.ID_teacher=Teachers.ID_teacher
+                            WHERE Students.ID_Student={current_student_ID}
+                            ORDER BY Grades.date DESC""")
+        grades_list = np.array(self.cursor.fetchall())
+        grades_5newest = grades_list[0:5]
+        ## Prepare text table for output
+        out =  '[data]     Ocena | Przedmiot (nauczyciel)\n'
+        out += '-----------------|-----------------------'
+        for row in grades_5newest:
+            # date with time cut out
+            date = row[0][0:10]
+            grade_value, chosen_subject_name, teacher_name, teacher_surname = row[1:5]
+            out += f'\n[{date}] {grade_value} | {chosen_subject_name} ({teacher_name} {teacher_surname})'
+        ## Print to textBox
+        self.plainTextEdit_student_newest_grades.setPlainText(out)
+        
+        # Plot 1: mean grades, all subjects
+        self.cursor.execute(f"""SELECT Subjects.subject_name, AVG(Grades.grade_value) FROM Subjects
+                            INNER JOIN Grades ON Subjects.ID_subject=Grades.ID_subject 
+                            INNER JOIN Students ON Grades.ID_student=Students.ID_Student 
+                            WHERE Students.ID_Student={current_student_ID}
+                            GROUP BY Subjects.subject_name""") 
+        
+        mean_grades_for_student = np.array(self.cursor.fetchall())
+        subject_names_short = [name[:3] for name in mean_grades_for_student[:,0]]
+
+        self.mpl_widget_student_1.axis.clear()
+        self.mpl_widget_student_1.axis.bar(subject_names_short, mean_grades_for_student[:,1].astype('float'), align='center', width=0.8, color="limegreen", edgecolor="lightgray", linewidth=0.7, zorder=3)
+        self.mpl_widget_student_1.axis.grid(zorder=0)
+        self.mpl_widget_student_1.axis.set(title="Średnie oceny dla poszczególnych przedmiotów",
+                                           ylabel='Średnia ocen')
+        self.mpl_widget_student_1.canvas.draw()
+                            
+        # Plot 2: number of grades, chosen subject
+        ## get grades for current student and subject
+        self.cursor.execute(f"""SELECT Grades.grade_value, COUNT(Grades.grade_value), Subjects.subject_name FROM Grades
+                            INNER JOIN Students ON Students.ID_Student=Grades.ID_student
+                            INNER JOIN Subjects ON Grades.ID_subject=Subjects.ID_subject
+                            WHERE (Students.ID_Student={current_student_ID} AND Subjects.subject_name='{current_subject_name}')
+                            GROUP BY Grades.grade_value""")
+        grades_subject_list = np.array(self.cursor.fetchall())
+        chosen_subject_name = grades_subject_list[0, 2]
+        grades_list = grades_subject_list[:, 0:2]
+
+        # Plot on PIE chart
+        def make_autopct(total):
+            def autopct_fun(pct):
+                val = int(round(pct*total/100.0))
+                return f'{val}'
+            return autopct_fun
+        
+        values = grades_list[:, 1].astype('float')
+
+        self.mpl_widget_student_2.axis.clear()
+        self.mpl_widget_student_2.axis.pie(values, labels=grades_list[:, 0], explode=grades_list.shape[0]*[0.02], autopct=make_autopct(values.sum()),
+                                           labeldistance=1.1, radius=1, textprops={'fontsize': 14})
+        self.mpl_widget_student_2.axis.set(title=f'Liczba poszczególnych ocen z [{chosen_subject_name}]')
+        self.mpl_widget_student_2.canvas.draw()
+
+        # Plot 3: exams grades
+        ## get exam grades for current student
+        self.cursor.execute(f"""SELECT exam_grade_hum, exam_grade_mat, exam_grade_lang FROM Students
+                            WHERE Students.ID_Student={current_student_ID}""")
+        exam_grades_list = np.array(self.cursor.fetchall())
+        exam_names = ['Humanistyczny', 'Matematyczny', 'Językowy']
+        print(exam_grades_list)
+        
+        # self.mpl_widget_student_3.axis.clear()
+        # self.mpl_widget_student_3.axis.barh(exam_names, exam_grades_list) #, align='center', height=0.8, color="limegreen", edgecolor="lightgray", linewidth=0.7, zorder=3)
+        # self.mpl_widget_student_3.axis.grid(zorder=0)
+        # self.mpl_widget_student_3.axis.set(title="Średnie oceny dla poszczególnych przedmiotów",
+        #                                    ylabel='Średnia ocen')
+        # self.mpl_widget_student_3.canvas.draw()
         pass
 
     def _prepare_teacher_comboBox(self):
         pass
 
-    def _refresh_teacher_plots(self):
+    def _refresh_teacher_view(self):
         pass
 
 
