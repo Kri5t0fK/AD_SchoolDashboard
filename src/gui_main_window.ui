@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -27,6 +27,11 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QGroupBox" name="groupBox_school_stats">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Statystyki szkoły</string>
           </property>
@@ -34,21 +39,14 @@
            <item row="1" column="0">
             <widget class="MplWidget" name="mpl_widget_general_1" native="true"/>
            </item>
+           <item row="2" column="1">
+            <widget class="MplWidget" name="mpl_widget_general_4" native="true"/>
+           </item>
            <item row="1" column="1">
             <widget class="MplWidget" name="mpl_widget_general_2" native="true"/>
            </item>
            <item row="2" column="0">
             <widget class="MplWidget" name="mpl_widget_general_3" native="true"/>
-           </item>
-           <item row="2" column="1">
-            <widget class="MplWidget" name="mpl_widget_general_4" native="true"/>
-           </item>
-           <item row="3" column="0" colspan="2">
-            <widget class="QPushButton" name="button_general_refresh">
-             <property name="text">
-              <string>Odśwież wykresy</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -62,6 +60,11 @@
        <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,1" columnstretch="1,1">
         <item row="2" column="0">
          <widget class="QGroupBox" name="groupBox_student_newest_grades">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Ostatnie 5 ocen</string>
           </property>
@@ -94,6 +97,11 @@
         </item>
         <item row="0" column="1" rowspan="3">
          <widget class="QGroupBox" name="groupBox_student_plots">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Wykresy</string>
           </property>
@@ -112,6 +120,11 @@
         </item>
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_student_data_in">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Podaj dane</string>
           </property>
@@ -141,6 +154,11 @@
         </item>
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_student_info">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Informacje o Uczniu</string>
           </property>
@@ -185,6 +203,11 @@
        <layout class="QGridLayout" name="gridLayout_6" rowstretch="1,3" columnstretch="1,1">
         <item row="1" column="0">
          <widget class="QGroupBox" name="groupBox_teacher_plots">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Wykres</string>
           </property>
@@ -197,6 +220,11 @@
         </item>
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox_teacher_data_in">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Podaj dane</string>
           </property>
@@ -236,6 +264,11 @@
         </item>
         <item row="0" column="1" rowspan="2">
          <widget class="QGroupBox" name="groupBox_techar_students_list">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="title">
            <string>Lista uczniów w klasie</string>
           </property>
@@ -244,6 +277,12 @@
             <widget class="QPlainTextEdit" name="plainTextEdit_teacher_students_list">
              <property name="enabled">
               <bool>true</bool>
+             </property>
+             <property name="font">
+              <font>
+               <family>Consolas</family>
+               <pointsize>20</pointsize>
+              </font>
              </property>
              <property name="readOnly">
               <bool>true</bool>
