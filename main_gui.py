@@ -167,7 +167,8 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
                                WHERE Students.ID_Student={current_student_ID}""")
         student_info = np.array(self.cursor.fetchall())
         ## Print to textBox
-        self.lineEdit_student_gender.setText(student_info[0][0])
+        gender_text = 'Mężczyzna' if student_info[0][0]=='M' else 'Kobieta'
+        self.lineEdit_student_gender.setText(gender_text)
         self.lineEdit_student_class.setText(student_info[0][1])
         
         # Text: Latest 5 grades
