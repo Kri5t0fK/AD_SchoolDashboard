@@ -42,8 +42,6 @@ class GUI_MainWindow(qtw.QMainWindow, Ui_MainWindow):
         self._prepare_teacher_subject_comboBox()
         self._prepare_teacher_class_comboBox()
 
-        # Connect buttons
-        self.button_general_refresh.clicked.connect(self._refresh_general_view)
         # Connect comboBoxes to autorefresh
         self.input_comboBox_student_student.currentIndexChanged.connect(self._refresh_from_student_student)
         self.input_comboBox_student_subject.currentIndexChanged.connect(self._refresh_student_view)
